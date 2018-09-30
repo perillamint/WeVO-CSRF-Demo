@@ -1,0 +1,22 @@
+{
+  "name": "wevo-csrf",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "http-server -c-1"
+  },
+  "keywords": [
+    "wevo",
+    "csrf",
+    "exploit",
+    "command",
+    "injection"
+  ],
+  "author": "perillamint",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "http-server": "^0.11.1"
+  }
+}

