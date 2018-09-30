@@ -37,5 +37,3 @@ if [ "$MODEL" != "" ]; then
         mtd_write -e $TARGETBLKDEV -r write /tmp/firmware.bin $TARGETBLKDEV
     fi
 fi
-
-echo $MODEL > /tmp/result
