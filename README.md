@@ -1,3 +1,7 @@
+# WeVO CSRF command injection PoC
+## 주의
+이 스크립트를 구동함으로서 발생하는 문제에 대해서는 어떤 책임도 지지 않습니다. Use at your own risk.
+
 # 실행 방법
 1. WeVO 라우터의 LAN 포트와 컴퓨터를 이더넷 케이블로 연결한다.
 2. WeVO 라우터와 연결된 컴퓨터 인터페이스의 IP를 192.168.10.2 로 설정한다.
